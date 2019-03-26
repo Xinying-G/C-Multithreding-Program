@@ -1,0 +1,133 @@
+{\rtf1\ansi\ansicpg936\cocoartf1671
+{\fonttbl\f0\fnil\fcharset134 PingFangSC-Semibold;\f1\fnil\fcharset134 PingFangSC-Regular;\f2\fmodern\fcharset0 Courier;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid301\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl400\sa280\partightenfactor0
+
+\f0\b\fs28 \cf2 \expnd0\expndtw0\kerning0
+Comp111 Assignment 2: ants and aardvarks\
+Overview\
+\pard\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1\b0\fs24 \cf2 One of the most famous problems in concurrency is that of the "Dining Philosophers", who must share knives and forks in a concurrent manner. But this has been studied too much in the literature, so instead, we will study the "Dining Aardvarks".\
+There are 11 aardvarks and 3 anthills. There are 100 ants in each anthill. Only 3 aardvarks can share one anthill at a time. It takes one second of real time for an aardvark to slurp up an ant, and another second for the aardvark to swallow it, during which time it is not using the anthill and another aardvark can start slurping. However, should an aardvark attempt to slurp an ant from an anthill where 3 aardvarks are already slurping, or make any other kind of mistake, including attempting to slurp from an already empty anthill or an anthill that doesn't exist, it will be\uc0\u160 4 seconds\u160 before the aardvark is available to slurp again. The simulator calls that 'sulking'.\
+\pard\pardeftab720\sl400\sa280\partightenfactor0
+
+\f0\b\fs28 \cf2 Objectives\
+\pard\pardeftab720\sl340\partightenfactor0
+
+\f1\b0\fs24 \cf2 Your objective is to manage the aardvarks so that all of the ants are consumed in a minimal amount of real time. Each aardvark is a thread in a multi-threaded program. You are given a simulator for the anthills that invokes the aardvarks and measures the resulting behavior.\
+\pard\pardeftab720\sl340\sa240\partightenfactor0
+\cf2 You must write one thread\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f2 \cf2  \
+extern void *aardvark(void *); \
+\pard\pardeftab720\sl340\partightenfactor0
+
+\f1 \cf2 that is\uc0\u160 invoked 11 times.\u160 This thread should simulate the behavior of one aardvark so that 11 instances of this thread solve the problem.\
+\pard\pardeftab720\sl340\sa240\partightenfactor0
+\cf2 When invoked, the thread has one argument passed to it, which is the name of the aardvark that it is simulating. The bare skeleton of a thread is something like:\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f2 \cf2  \
+int initialized=0; \
+void *aardvark(void *input) \{\
+    char aname = *(char *)input; // name of aardvark, for debugging purposes\
+    pthread_mutex_lock(&init_lock); // declared in anthills.h\
+    if (!initialized++) \{ // this is executed for only one thread.\
+	// initialize all variables, mutexes, semaphores here\
+    \} \
+    pthread_mutex_unlock(&init_lock); \
+    while (chow_time()) \{  // there is an ant to eat\
+	// try to slurp an ant!\
+	slurp(aname); \
+    \}\
+    return NULL;\
+\}\
+\pard\pardeftab720\sl340\sa240\partightenfactor0
+
+\f1 \cf2 Each thread may utilize the following interface, documented in\uc0\u160 
+\f2 /comp/111/a/a2/anthills.h
+\f1 \uc0\u160 :\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f2 \cf2  \
+#define TRUE 1\
+#define FALSE 0 \
+#define AARDVARKS 11\
+#define ANTHILLS 3\
+#define ANTS_PER_HILL 100\
+#define AARDVARKS_PER_HILL 3\
+extern int slurp(char aname, int anthill); // eat one ant. \
+extern int chow_time(); // whether there are ants to eat\
+extern double elapsed(); // how much time has been spent? \
+extern pthread_mutex_t init_lock; // resolve init race conditions \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sl280\partightenfactor0
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+slurp
+\f1 \uc0\u160 tries to slurp up an ant. It returns in two seconds of real time if it succeeds, and\u160 4 seconds of real time if it does not. During the second second of a successful\u160 
+\f2 slurp
+\f1 , the hill can be slurped again. However, the simulator "believes" the thread about what constitutes the identity of his aardvark. One aardvark will not be allowed to slurp from two anthills at the same time, if another thread "impersonates" the same aardvark by giving the wrong name.\uc0\u160 
+\f2 slurp
+\f1 \uc0\u160 returns 1 if it succeeds (and the aardvark actually consumes an ant) and 0 if it fails.\
+\ls1\ilvl0
+\f2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+chow_time
+\f1 \uc0\u160 returns 1 if there's an ant left anywhere, and 0 if not. Your threads should return when this returns 0.\
+\ls1\ilvl0
+\f2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+elapsed
+\f1 \uc0\u160 returns the seconds of real time (wallclock time) since the start of the simulation.\
+\pard\pardeftab720\sl340\partightenfactor0
+\cf2 A starting version of the aardvarks code may be found in\uc0\u160 
+\f2 /comp/111/a/a2/aardvarks.c
+\f1 .\
+\pard\pardeftab720\sl400\sa280\partightenfactor0
+
+\f0\b\fs28 \cf2 The Simulator\
+\pard\pardeftab720\sl340\partightenfactor0
+
+\f1\b0\fs24 \cf2 You will test your\uc0\u160 
+\f2 aardvarks.c
+\f1 \uc0\u160 by use of a simulator, currently contained in\u160 
+\f2 /comp/111/a/a2/anthills.c
+\f1 \uc0\u160 and\u160 
+\f2 /comp/111/a/a2/anthills.h
+\f1 . You may not modify this simulator (except to test your theories), but may use whatever information you can glean from the source code. During grading,\uc0\u160 this simulator will be the one that is used. The simulator creates your threads and waits for them to complete. It also provides mechanisms by which your threads must\u160 
+\f2 slurp
+\f1 \uc0\u160 the ants. These mechanisms employ concurrency locks in the manner discussed in class: see the code for details.\
+\
+\pard\pardeftab720\sl400\sa280\partightenfactor0
+
+\f0\b\fs28 \cf2 Getting started\
+\pard\pardeftab720\sl400\sa280\partightenfactor0
+
+\f1\b0\fs24 \cf2 To get started,\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f2 \cf2 mkdir a2\
+cd a2 \
+cp /comp/111/a/a2/aardvarks.c .\
+ln -s /comp/111/a/a2/anthills.o .\
+gcc -g aardvarks.c anthills.o -lpthread -lrt \
+./a.out
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sl340\partightenfactor0
+\ls2\ilvl0\cf2 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sl340\partightenfactor0
+\ls3\ilvl0\cf2 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sl340\partightenfactor0
+\ls4\ilvl0\cf2 \
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f2 \cf2 \
+}
